@@ -1,5 +1,6 @@
 use std::{
-    io::Error,
+    collections::HashMap,
+    io::{BufReader, Error, Read},
     net::{TcpListener, TcpStream},
 };
 
@@ -36,12 +37,45 @@ impl Weba {
 
     fn handle_client(&self, client: Result<TcpStream, Error>) {
         match client {
-            Result::Ok(client) => {}
+            Result::Ok(client) => {
+                let mut reader = BufReader::new(&client);
+                let mut request_string = String::new();
+                reader
+                    .read_to_string(&mut request_string)
+                    .expect("Reader error");
+
+                let new_request = Request::new(request_string);
+            }
+
             Result::Err(err) => {
                 eprintln!("Error while handling client: {err}");
             }
         }
     }
+}
+
+struct Request {
+    method: String,
+    path: String,
+    version: String,
+    headers: Headers,
+}
+
+impl Request {
+    pub fn new(request_string: String) -> Request {
+        Request {
+            method: String::from("a"),
+            path: String::from("n"),
+            version: String::from("1"),
+            headers: Headers {
+                headers: HashMap::new(),
+            },
+        }
+    }
+}
+
+struct Headers {
+    headers: HashMap<String, String>,
 }
 
 #[cfg(test)]
