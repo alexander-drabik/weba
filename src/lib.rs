@@ -1,5 +1,5 @@
 pub struct Weba {
-    routes: Vec<String>,
+    routes: Vec<(String, fn() -> ())>,
 }
 
 impl Weba {
@@ -7,8 +7,9 @@ impl Weba {
         Weba { routes: vec![] }
     }
 
-    pub fn route(mut self, name: &str) -> Self {
-        self.routes.push(String::from(name));
+    // Creates new route
+    pub fn route(mut self, name: &str, function: fn() -> ()) -> Self {
+        self.routes.push((String::from(name), function));
         self
     }
 }
@@ -19,8 +20,12 @@ mod tests {
 
     #[test]
     fn routes() {
-        let weba = Weba::new().route("/").route("/test");
+        fn index() {
+            println!("test");
+        }
 
-        assert_eq!(weba.routes, vec![String::from("/"), String::from("/test")])
+        let weba = Weba::new().route("/", index).route("/test", index);
+
+        assert_eq!(weba.routes[0].0, String::from("/"))
     }
 }
